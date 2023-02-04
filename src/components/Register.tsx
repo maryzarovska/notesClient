@@ -6,7 +6,7 @@ type UsersProps = {
     setUsers: (users: User[]) => void;
 }
 
-function Users({ users, setUsers }: UsersProps) {
+function Register({ users, setUsers }: UsersProps) {
     const [username, setUsername] = useState<string>("");
     const [password, setPassword] = useState<string>("");
 
@@ -24,18 +24,15 @@ function Users({ users, setUsers }: UsersProps) {
         })
     };
 
-    return (
+    return ( 
         <>
-            {/* <p>
+            <p>
                 <input className='input1' type="text" value={username} onChange={(event) => setUsername(event.target.value)} />
                 <input className='input1' type="text" value={password} onChange={(event) => setPassword(event.target.value)} />
                 <button className='button2' onClick={addUser}>Add</button>
-            </p> */}
-            <ul>
-                {users.map(user => <li key={user._id}>{user.username}</li>)}
-            </ul>
+            </p>
         </>
-    );
+     );
 }
 
-export default Users;
+export default Register;

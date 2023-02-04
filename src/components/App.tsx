@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import Home from './Home';
 import Notes from './Notes';
 import Users from './Users';
+import Register from './Register';
+import axios from 'axios';
 
 import './App.css';
 
@@ -11,18 +13,16 @@ function App() {
     const [notes, setNotes] = useState<Note[]>([]);
 
     useEffect(() => {
-        setUsers([
-            { id: 1, name: 'John', age: 18 },
-            { id: 2, name: 'Alice' },
-            { id: 3, name: 'Tom', age: 19 },
-            { id: 4, name: 'Bob', age: 16 }
-        ]);
-        setNotes([
-            { id: 1, userId: 1, text: "Text 1" },
-            { id: 2, userId: 1, text: "Text 2" },
-            { id: 3, userId: 2, text: "Text 3" },
-            { id: 4, userId: 4, text: "Text 4" }
-        ]);
+        axios.get<User[]>("http://localhost:5000/users").then(response => {
+            setUsers(response.data);
+            console.log(response.data);
+        });
+
+        axios.get<Note[]>("http://localhost:5000/notes").then(response => {
+            setNotes(response.data);
+            console.log(response.data);
+        });
+
     }, []);
 
     return (
@@ -31,10 +31,12 @@ function App() {
                 <button className='navbutton' onClick={() => setPage("home")}>Home</button>
                 <button className='navbutton' onClick={() => setPage("users")}>Users</button>
                 <button className='navbutton' onClick={() => setPage("notes")}>Notes</button>
+                <button className='navbutton' onClick={() => setPage("register")}>Register</button>
             </p>
             { page === "home" && <Home /> }
             { page === "users" && <Users users={users} setUsers={setUsers} /> }
             { page === "notes" && <Notes users={users} setUsers={setUsers} notes={notes} setNotes={setNotes}/> }
+            { page === "register" && <Register users={users} setUsers={setUsers} /> }
         </>
     );
 }

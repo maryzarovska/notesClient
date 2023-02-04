@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import axios from 'axios';
+import React, { useEffect, useState } from 'react';
 import { isErrored } from 'stream';
 
 type NotesProps = {
@@ -9,22 +10,33 @@ type NotesProps = {
 }
 
 function Notes({ users, setUsers, notes, setNotes }: NotesProps) {
-    const [userId, setUserId] = useState<number>(0);
+    const [username, setUsername] = useState<string>("");
     const [userText, setUserText] = useState<string>("");
+    useEffect(() => {
+        setUsername(users[0].username);
+    }, [])
 
     const addNote = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-        setNotes([...notes, {id: notes.length + 1, userId: userId, text: userText}])
+        if(userText === "") {
+            return;
+        }
+        axios.post<Note>("http://localhost:5000/notes", {
+            username:username, text:userText
+        }).then(response => {
+            setNotes([...notes, response.data]);
+            setUserText("");
+        });
     }
 
     return (
         <>
         <p>
-            <select className='select1' onChange={(event) => setUserId(Number(event.target.value))}>
-                {users.map(user => <option key={user.id} value={user.id}>{user.name}</option>)}
+            <select className='select1' onChange={(event) => setUsername(event.target.value)}>
+                {users.map(user => <option key={user._id} value={user.username}>{user.username}</option>)}
             </select>
         </p>
         <ul>
-            {notes.filter(note => note.userId === userId).map((note => <li key={note.id}>{note.text}</li>))}
+            {notes.filter(note => note.username === username).map((note => <li key={note._id}>{note.text}</li>))}
         </ul>
 
         <input className='input1' type="text" value={userText} onChange = {(event) => setUserText(event.target.value)}/>

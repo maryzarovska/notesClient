@@ -1,11 +1,11 @@
 interface User {
-    id: number,
-    name: string,
-    age?: number
+    _id: string,
+    username: string,
+    password: string
 }
 
 interface Note {
-    id: number,
-    userId: number,
+    _id: string,
+    username: string,
     text: string
 }
