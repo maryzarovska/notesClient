@@ -1,6 +1,7 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { isErrored } from 'stream';
+import {Routes, Route, Link} from 'react-router-dom'; 
 
 type NotesProps = {
     users: User[];
@@ -30,13 +31,16 @@ function Notes({ users, setUsers, notes, setNotes }: NotesProps) {
 
     return (
         <>
-        <p>
+        {/* <p>
             <select className='select1' onChange={(event) => setUsername(event.target.value)}>
                 {users.map(user => <option key={user._id} value={user.username}>{user.username}</option>)}
             </select>
-        </p>
+        </p> */}
+
+        
+
         <ul>
-            {notes.filter(note => note.username === username).map((note => <li key={note._id}>{note.text}</li>))}
+            {notes.filter(note => note.username === username).map((note => <li key={note._id}><Link to={`/notes/${note._id}`}>{note.text}</Link></li>))}
         </ul>
 
         <input className='input1' type="text" value={userText} onChange = {(event) => setUserText(event.target.value)}/>
