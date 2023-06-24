@@ -67,7 +67,7 @@ function App() {
                 <Route path='/register' element={<Register users={users} setUsers={setUsers} />}/>
                 <Route path='/login' element={<Login users={users} setUsers={setUsers}/>} />
                 <Route path='/logout' element={<Logout />} />
-                <Route path='/profile' element={<Profile/>} />
+                <Route path='/profile' element={<Profile users={users} setUsers={setUsers} notes={notes} setNotes={setNotes}/>} />
 
                 <Route path='*' element={<NotFound />} />
             </Routes>

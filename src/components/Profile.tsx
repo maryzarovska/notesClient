@@ -4,7 +4,14 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { logout } from "../application-store/userSlice";
 
-function Profile() {
+type ProfileProps = {
+    users: User[];
+    setUsers: (users: User[]) => void;
+    notes: Note[];
+    setNotes: (notes: Note[]) => void;
+}
+
+function Profile({ users, setUsers, notes, setNotes }: ProfileProps) {
     const user = useSelector((store: any) => store.user.value);
     const [username, setUsername] = useState<string>("");
     const [errorMessage, setErrorMessage] = useState<string>("");
@@ -19,12 +26,13 @@ function Profile() {
         setEditState3(true);
     }
 
-    // ${user?._id}
     const deleteProfile = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         axios.delete<User>(`http://localhost:5000/users/${user?._id}`).then(response => {
-            if (response.data) {
-                dispatch(logout())
-                navigate("/login")
+            if (response.status === 200) {
+                setUsers(users.filter(u => u._id !== response.data._id));
+                setNotes(notes.filter(n => n.username !== response.data.username));
+                dispatch(logout());
+                navigate("/login");
             }
         })
     }
@@ -79,68 +87,68 @@ function Profile() {
         }
 
     }
-    
-    return ( <>
+
+    return (<>
         <h3>Username: </h3>
         <p>
-                {editState ?
-                    <>
-                        <input type="text" value={user?.username} onChange={event => {
-                            if (username) {
-                                setUsername({ ...user, username: event.target.value });
-                            }
-                            setErrorMessage("")
+            {editState ?
+                <>
+                    <input type="text" value={user?.username} onChange={event => {
+                        if (username) {
+                            setUsername({ ...user, username: event.target.value });
+                        }
+                        setErrorMessage("")
 
-                        }} />
+                    }} />
 
-                        <br />
-                        <br />
-                        <button onClick={saveUsername}>Save</button>
-                    </> :
-                    <>
-                        {user?.username}
-                        <br />
-                        <br />
-                        <button onClick={editUsername}>Edit</button>
-                    </>
-                }
-            </p>
+                    <br />
+                    <br />
+                    <button onClick={saveUsername}>Save</button>
+                </> :
+                <>
+                    {user?.username}
+                    <br />
+                    <br />
+                    <button onClick={editUsername}>Edit</button>
+                </>
+            }
+        </p>
         <h3>Email: </h3>
         <p>
-                {editState2 ?
-                    <>
-                        <input type="text" value={user?.email} onChange={event => {
-                            if (email) {
-                                setEmail({ ...user, email: event.target.value });
-                            }
-                            setErrorMessage("")
+            {editState2 ?
+                <>
+                    <input type="text" value={user?.email} onChange={event => {
+                        if (email) {
+                            setEmail({ ...user, email: event.target.value });
+                        }
+                        setErrorMessage("")
 
-                        }} />
+                    }} />
 
-                        <br />
-                        <br />
-                        <button onClick={saveEmail}>Save</button>
-                    </> :
-                    <>
-                        {user?.email}
-                        <br />
-                        <br />
-                        <button onClick={editEmail}>Edit</button>
-                    </>
-                }
-            </p>
+                    <br />
+                    <br />
+                    <button onClick={saveEmail}>Save</button>
+                </> :
+                <>
+                    {user?.email}
+                    <br />
+                    <br />
+                    <button onClick={editEmail}>Edit</button>
+                </>
+            }
+        </p>
 
         <p>
             {editState3 ?
                 <>
                     <button onClick={deleteProfile}>Yes, delete profile</button>
-                </>   :
+                </> :
                 <>
                     <button onClick={predelete}>Delete profile</button>
-                </> 
+                </>
             }
         </p>
-    </> );
+    </>);
 }
 
 export default Profile;
