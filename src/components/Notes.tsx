@@ -2,6 +2,7 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { isErrored } from 'stream';
 import {Routes, Route, Link} from 'react-router-dom'; 
+import { useSelector } from 'react-redux';
 
 type NotesProps = {
     users: User[];
@@ -11,18 +12,17 @@ type NotesProps = {
 }
 
 function Notes({ users, setUsers, notes, setNotes }: NotesProps) {
-    const [username, setUsername] = useState<string>("");
+    // const [username, setUsername] = useState<string>("");
     const [userText, setUserText] = useState<string>("");
-    useEffect(() => {
-        setUsername(users[0].username);
-    }, [])
+    const user = useSelector((store: any) => store.user.value);
+    
 
     const addNote = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         if(userText === "") {
             return;
         }
         axios.post<Note>("http://localhost:5000/notes", {
-            username:username, text:userText
+            username:user?.username, text:userText
         }).then(response => {
             setNotes([...notes, response.data]);
             setUserText("");
@@ -40,7 +40,7 @@ function Notes({ users, setUsers, notes, setNotes }: NotesProps) {
         
 
         <ul>
-            {notes.filter(note => note.username === username).map((note => <li key={note._id}><Link to={`/notes/${note._id}`}>{note.text}</Link></li>))}
+            {notes.filter(note => note.username === user?.username).map((note => <li key={note._id}><Link to={`/notes/${note._id}`}>{note.text}</Link></li>))}
         </ul>
 
         <input className='input1' type="text" value={userText} onChange = {(event) => setUserText(event.target.value)}/>
