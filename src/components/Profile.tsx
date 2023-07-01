@@ -1,8 +1,8 @@
 import axios from "axios";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { logout } from "../application-store/userSlice";
+import { logout, login } from "../application-store/userSlice";
 
 type ProfileProps = {
     users: User[];
@@ -12,14 +12,19 @@ type ProfileProps = {
 }
 
 function Profile({ users, setUsers, notes, setNotes }: ProfileProps) {
-    const user = useSelector((store: any) => store.user.value);
-    const [username, setUsername] = useState<string>("");
+    const user: User = useSelector((store: any) => store.user.value);
+    // const [username, setUsername] = useState<string>("");
     const [errorMessage, setErrorMessage] = useState<string>("");
     const [email, setEmail] = useState<string>("");
     const [editState2, setEditState2] = useState<boolean>(false);
     const [editState3, setEditState3] = useState<boolean>(false);
     const navigate = useNavigate();
     const dispatch = useDispatch();
+
+    useEffect(() => {
+        if (user.email)
+            setEmail(user.email);
+    }, [user.email]);
 
     const predelete = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         setEditState3(true);
@@ -37,32 +42,40 @@ function Profile({ users, setUsers, notes, setNotes }: ProfileProps) {
     }
 
     const editEmail = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-        setEditState2(true);
-    }
-
-    const saveEmail = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-        if (user?.email === "") {
+        
+        if (user.email) {
+            setEditState2(true);
+            
+        }
+        else {
             setErrorMessage("You do not have an email")
 
         }
-        else {
+    }
+
+    const saveEmail = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+        // if (user?.email === "") {
+        //     setErrorMessage("You do not have an email")
+
+        // }
+        // else {
             setEditState2(false);
 
-            axios.put<User>(`http://localhost:5000/users/${user?._id}`).then(response => {
+            axios.put<User>(`http://localhost:5000/users/${user?._id}`, {email}).then(response => {
 
-                if (user) {
+                if (response.status === 200) {
                     const temp = []
-                    for (let i = 0; users.length; i++){
-                        if(users[i]._id != user.id) {
+                    for (let i = 0; i < users.length; i++){
+                        if(users[i]._id != response.data._id) {
                             temp.push(users[i])
                         }
-                        else temp.push(user)
+                        else temp.push(response.data)
                     }
-
+                    dispatch(login(response.data));
                     setUsers(temp)
                 }
             })
-        }
+        // }
 
     }
 
@@ -72,11 +85,11 @@ function Profile({ users, setUsers, notes, setNotes }: ProfileProps) {
         <p>
             {editState2 ?
                 <>
-                    <input type="text" value={user?.email} onChange={event => {
-                        if (user?.email) {
-                            //setUser({ ...user, email: event.target.value });
-                        }
-                        setErrorMessage("")
+                    <input type="text" value={email} onChange={event => {
+                        // if (user?.email) {
+                            setEmail(event.target.value);
+                        // }
+                        setErrorMessage("");
 
                     }} />
 
